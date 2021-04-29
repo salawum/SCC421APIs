@@ -9,7 +9,7 @@ from swagger_server.models.species_list import SpeciesList  # noqa: E501
 from swagger_server import util
 from flask import Response
 
-USERNAME = os.getenv('DB_USR', 'root')
+USERNAME = os.getenv('DB_USER', 'root')
 PASSWORD = os.getenv('DB_PWD', 'root')
 HOST = os.getenv('DB_HOST', 'localhost')
 PORT = os.getenv('DB_PORT', 3306)
