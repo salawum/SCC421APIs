@@ -1,0 +1,667 @@
+openapi: 3.0.1
+info:
+  title: 4th Year Project
+  description: (Will come up with a better name later)
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: Characters
+  description: Operations about characters in the Star Wars universe
+- name: Planets
+  description: Operations about planets in the Star Wars universe
+- name: Species
+  description: Operations about species in the Star Wars universe
+paths:
+  /character:
+    put:
+      tags:
+      - Characters
+      summary: Update an existing Character object
+      operationId: update_character
+      requestBody:
+        description: Character object to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Character'
+        required: true
+      responses:
+        "200":
+          description: Successfully updated character
+        "400":
+          description: Bad Request
+        "404":
+          description: Character not found
+        "409":
+          description: Conflict with existing data
+      x-openapi-router-controller: swagger_server.controllers.characters_controller
+    post:
+      tags:
+      - Characters
+      summary: Add a character to the database
+      operationId: add_character
+      requestBody:
+        description: Character object to be added to the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Character'
+        required: true
+      responses:
+        "200":
+          description: Successfully added character
+        "400":
+          description: Bad Request
+        "404":
+          description: Character not found
+        "409":
+          description: Conflict with existing data
+      x-openapi-router-controller: swagger_server.controllers.characters_controller
+  /character/{name}:
+    get:
+      tags:
+      - Characters
+      summary: Get a character from the database
+      operationId: get_character
+      parameters:
+      - name: name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully found Character object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Character'
+        "400":
+          description: Invalid name supplied
+        "404":
+          description: Character not found
+      x-openapi-router-controller: swagger_server.controllers.characters_controller
+    delete:
+      tags:
+      - Characters
+      summary: Delete a character from the database
+      operationId: delete_character
+      parameters:
+      - name: name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully deleted Character object from the database
+        "400":
+          description: Invalid name supplied
+        "404":
+          description: Character not found
+      x-openapi-router-controller: swagger_server.controllers.characters_controller
+  /character/mass/{mass}:
+    get:
+      tags:
+      - Characters
+      summary: Get a list of all charcaters with mass greater than or equal to the
+        specified mass value
+      operationId: get_mass
+      parameters:
+      - name: mass
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Successfully found character(s) with suitable mass
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CharacterList'
+        "400":
+          description: Invalid mass supplied
+        "404":
+          description: Character(s) not found
+      x-openapi-router-controller: swagger_server.controllers.characters_controller
+  /planet:
+    put:
+      tags:
+      - Planets
+      summary: Update an existing planet
+      operationId: update_planet
+      requestBody:
+        description: Planet object to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Planet'
+        required: true
+      responses:
+        "200":
+          description: Successfully updated Planet object
+        "400":
+          description: Bad Request
+        "404":
+          description: Planet not found
+        "409":
+          description: Conflict with existing data
+      x-openapi-router-controller: swagger_server.controllers.planets_controller
+    post:
+      tags:
+      - Planets
+      summary: Add a planet to the database
+      operationId: add_planet
+      requestBody:
+        description: Planet object to be added to the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Planet'
+        required: true
+      responses:
+        "200":
+          description: Successfully added Planet object to the database
+        "400":
+          description: Bad Request
+        "404":
+          description: Planet not found
+        "409":
+          description: Conflict with existing data
+      x-openapi-router-controller: swagger_server.controllers.planets_controller
+  /planet/{name}:
+    get:
+      tags:
+      - Planets
+      summary: Get a planet from the database
+      operationId: get_planet
+      parameters:
+      - name: name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully found Planet object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Planet'
+        "400":
+          description: Invalid name supplied
+        "404":
+          description: Planet not found
+      x-openapi-router-controller: swagger_server.controllers.planets_controller
+    delete:
+      tags:
+      - Planets
+      summary: Delete a planet from the database
+      operationId: delete_planet
+      parameters:
+      - name: name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully deleted Planet object from the database
+        "400":
+          description: Invalid name supplied
+        "404":
+          description: Planet not found
+      x-openapi-router-controller: swagger_server.controllers.planets_controller
+  /planet/terrain/{terrain}:
+    get:
+      tags:
+      - Planets
+      summary: Get a list of planets with the specified terrain type
+      operationId: get_terrain
+      parameters:
+      - name: terrain
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully found planet(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanetList'
+        "400":
+          description: Invalid terrain supplied
+        "404":
+          description: Planet(s) not found
+      x-openapi-router-controller: swagger_server.controllers.planets_controller
+  /planet/uninhabited:
+    get:
+      tags:
+      - Planets
+      summary: Get a list of planets that are uninhabited
+      operationId: get_uninhabited
+      responses:
+        "200":
+          description: Successfully found planet(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanetList'
+        "404":
+          description: Planet(s) not found
+          content: {}
+      x-openapi-router-controller: swagger_server.controllers.planets_controller
+  /species:
+    put:
+      tags:
+      - Species
+      summary: Update an existing species
+      operationId: update_species
+      requestBody:
+        description: Species object to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Species'
+        required: true
+      responses:
+        "200":
+          description: Successfully updated Species object
+        "400":
+          description: Bad Request
+        "404":
+          description: Species not found
+        "409":
+          description: Conflict with existing data
+      x-openapi-router-controller: swagger_server.controllers.species_controller
+    post:
+      tags:
+      - Species
+      summary: Add a species to the database
+      operationId: add_species
+      requestBody:
+        description: Species object to be added to the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Species'
+        required: true
+      responses:
+        "200":
+          description: Successfully added Species to database
+        "400":
+          description: Bad Request
+        "404":
+          description: Species not found
+        "409":
+          description: Conflict with existing data
+      x-openapi-router-controller: swagger_server.controllers.species_controller
+  /species/{name}:
+    get:
+      tags:
+      - Species
+      summary: Get a species from the database
+      operationId: get_species
+      parameters:
+      - name: name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully found Species object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Species'
+        "400":
+          description: Invalid name supplied
+        "404":
+          description: Species not found
+      x-openapi-router-controller: swagger_server.controllers.species_controller
+    delete:
+      tags:
+      - Species
+      summary: Delete a species from the database
+      operationId: delete_species
+      parameters:
+      - name: name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully deleted Species object from the database
+        "400":
+          description: Invalid name supplied
+        "404":
+          description: Species not found
+      x-openapi-router-controller: swagger_server.controllers.species_controller
+  /species/eye/{eye_color}:
+    get:
+      tags:
+      - Species
+      summary: Get a list of species with the specified eye color
+      operationId: get_eye_color
+      parameters:
+      - name: eye_color
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully found species(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpeciesList'
+        "400":
+          description: Invalid eye color supplied
+        "404":
+          description: Species(s) not found
+      x-openapi-router-controller: swagger_server.controllers.species_controller
+components:
+  schemas:
+    Character:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: Luke Skywalker
+        height:
+          type: integer
+          example: 172
+        mass:
+          type: number
+          example: 77
+        hair_color:
+          type: string
+          example: blonde
+        skin_color:
+          type: string
+          example: fair
+        eye_color:
+          type: string
+          example: blue
+        birth_year:
+          type: string
+          example: 19BBY
+        gender:
+          type: string
+          example: male
+        homeworld:
+          type: string
+          example: Tatooine
+        species:
+          type: string
+          example: Human
+      example:
+        homeworld: Tatooine
+        eye_color: blue
+        gender: male
+        skin_color: fair
+        species: Human
+        mass: 77
+        name: Luke Skywalker
+        height: 172
+        hair_color: blonde
+        birth_year: 19BBY
+    CharacterList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CharacterList_inner'
+    Planet:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: Alderaan
+        rotation_period:
+          type: number
+          example: 24
+        orbital_period:
+          type: number
+          example: 364
+        diameter:
+          type: integer
+          example: 12500
+        climate:
+          type: string
+          example: temperate
+        gravity:
+          type: string
+          example: 1 standard
+        terrain:
+          type: string
+          example: "grasslands, mountains"
+        surface_water:
+          type: number
+          example: 40
+        population:
+          type: integer
+          example: 2000000000
+      example:
+        orbital_period: 364
+        surface_water: 40
+        diameter: 12500
+        gravity: 1 standard
+        name: Alderaan
+        climate: temperate
+        rotation_period: 24
+        terrain: "grasslands, mountains"
+        population: 2000000000
+    PlanetList:
+      type: array
+      items:
+        $ref: '#/components/schemas/PlanetList_inner'
+    Species:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: Human
+        classification:
+          type: string
+          example: mammal
+        designation:
+          type: string
+          example: sentient
+        average_height:
+          type: integer
+          example: 180
+        skin_colors:
+          type: string
+          example: "caucasian, black, asian, hispanic"
+        hair_colours:
+          type: string
+          example: "blonde, brown, black, red"
+        eye_colors:
+          type: string
+          example: "brown, blue, green, hazel, grey, amber"
+        average_lifespan:
+          type: integer
+          example: 120
+        language:
+          type: string
+          example: Galactic Basic
+        homeworld:
+          type: string
+          example: Coruscant
+      example:
+        average_height: 180
+        skin_colors: "caucasian, black, asian, hispanic"
+        homeworld: Coruscant
+        name: Human
+        eye_colors: "brown, blue, green, hazel, grey, amber"
+        language: Galactic Basic
+        designation: sentient
+        classification: mammal
+        average_lifespan: 120
+        hair_colours: "blonde, brown, black, red"
+    SpeciesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SpeciesList_inner'
+    CharacterList_inner:
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          example: Luke Skywalker
+        height:
+          type: integer
+          example: 172
+        mass:
+          type: number
+          example: 77
+        hair_color:
+          type: string
+          example: blonde
+        skin_color:
+          type: string
+          example: fair
+        eye_color:
+          type: string
+          example: blue
+        birth_year:
+          type: string
+          example: 19BBY
+        gender:
+          type: string
+          example: male
+        homeworld:
+          type: string
+          example: Tatooine
+        species:
+          type: string
+          example: Human
+      example:
+        homeworld: Tatooine
+        eye_color: blue
+        gender: male
+        skin_color: fair
+        species: Human
+        mass: 77
+        name: Luke Skywalker
+        height: 172
+        hair_color: blonde
+        birth_year: 19BBY
+    PlanetList_inner:
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          example: Alderaan
+        rotation_period:
+          type: number
+          example: 24
+        orbital_period:
+          type: number
+          example: 364
+        diameter:
+          type: integer
+          example: 12500
+        climate:
+          type: string
+          example: temperate
+        gravity:
+          type: string
+          example: 1 standard
+        terrain:
+          type: string
+          example: "grasslands, mountains"
+        surface_water:
+          type: number
+          example: 40
+        population:
+          type: integer
+          example: 2000000000
+      example:
+        orbital_period: 364
+        surface_water: 40
+        diameter: 12500
+        gravity: 1 standard
+        name: Alderaan
+        climate: temperate
+        rotation_period: 24
+        terrain: "grasslands, mountains"
+        population: 2000000000
+    SpeciesList_inner:
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          example: Human
+        classification:
+          type: string
+          example: mammal
+        designation:
+          type: string
+          example: sentient
+        average_height:
+          type: integer
+          example: 180
+        skin_colors:
+          type: string
+          example: "caucasian, black, asian, hispanic"
+        hair_colours:
+          type: string
+          example: "blonde, brown, black, red"
+        eye_colors:
+          type: string
+          example: "brown, blue, green, hazel, grey, amber"
+        average_lifespan:
+          type: integer
+          example: 120
+        language:
+          type: string
+          example: Galactic Basic
+        homeworld:
+          type: string
+          example: Coruscant
+      example:
+        average_height: 180
+        skin_colors: "caucasian, black, asian, hispanic"
+        homeworld: Coruscant
+        name: Human
+        eye_colors: "brown, blue, green, hazel, grey, amber"
+        language: Galactic Basic
+        designation: sentient
+        classification: mammal
+        average_lifespan: 120
+        hair_colours: "blonde, brown, black, red"
+
