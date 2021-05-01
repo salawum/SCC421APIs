@@ -19,6 +19,10 @@ using IO.Swagger.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using IO.Swagger.Models;
 
+using MySqlConnector;
+using System.Data;
+using System.Threading.Tasks;
+
 namespace IO.Swagger.Controllers
 { 
     /// <summary>
@@ -39,21 +43,30 @@ namespace IO.Swagger.Controllers
         [Route("/planet")]
         [ValidateModelState]
         [SwaggerOperation("AddPlanet")]
-        public virtual IActionResult AddPlanet([FromBody]Planet body)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        public async virtual Task<IActionResult> AddPlanet([FromBody]Planet body)
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("addPlanet", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400);
+                cmd.Parameters.AddWithValue("@p_name", body.Name);
+                cmd.Parameters.AddWithValue("@p_rotation_period", body.RotationPeriod);
+                cmd.Parameters.AddWithValue("@p_orbital_period", body.OrbitalPeriod);
+                cmd.Parameters.AddWithValue("@p_diameter", body.Diameter);
+                cmd.Parameters.AddWithValue("@p_climate", body.Climate);
+                cmd.Parameters.AddWithValue("@p_gravity", body.Gravity);
+                cmd.Parameters.AddWithValue("@p_terrain", body.Terrain);
+                cmd.Parameters.AddWithValue("@p_surface_water", body.SurfaceWater);
+                cmd.Parameters.AddWithValue("@p_population", body.Population);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-
-            //TODO: Uncomment the next line to return response 409 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(409);
-
-            throw new NotImplementedException();
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                return StatusCode(200, body);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
 
         /// <summary>
@@ -67,18 +80,25 @@ namespace IO.Swagger.Controllers
         [Route("/planet/{name}")]
         [ValidateModelState]
         [SwaggerOperation("DeletePlanet")]
-        public virtual IActionResult DeletePlanet([FromRoute][Required]string name)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        public async virtual Task<IActionResult> DeletePlanet([FromRoute][Required]string name)
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("deletePlanet", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400);
+                cmd.Parameters.AddWithValue("@p_name", name);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-
-            throw new NotImplementedException();
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                if(rdr.RecordsAffected >= 1) {
+                    return StatusCode(200);
+                }
+                return StatusCode(404);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
 
         /// <summary>
@@ -93,23 +113,40 @@ namespace IO.Swagger.Controllers
         [ValidateModelState]
         [SwaggerOperation("GetPlanet")]
         [SwaggerResponse(statusCode: 200, type: typeof(Planet), description: "Successfully found Planet object")]
-        public virtual IActionResult GetPlanet([FromRoute][Required]string name)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Planet));
+        public async virtual Task<IActionResult> GetPlanet([FromRoute][Required]string name)
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("getPlanet", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400);
+                cmd.Parameters.AddWithValue("@p_name", name);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-            string exampleJson = null;
-            exampleJson = "{\n  \"orbital_period\" : 364,\n  \"surface_water\" : 40,\n  \"diameter\" : 12500,\n  \"gravity\" : \"1 standard\",\n  \"name\" : \"Alderaan\",\n  \"climate\" : \"temperate\",\n  \"rotation_period\" : 24,\n  \"terrain\" : \"grasslands, mountains\",\n  \"population\" : 2000000000\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Planet>(exampleJson)
-                        : default(Planet);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                while(await rdr.ReadAsync()) {
+                    object[] res = new object[rdr.FieldCount];
+                    rdr.GetValues(res);
+                    string body =
+                        "{name: " + res[1] + ", " +
+                        "rotation_period: " + res[2] + ", " +
+                        "orbital_period: " + res[3] + ", " +
+                        "diameter: " + res[4] + ", " +
+                        "climate: " + res[5] + ", " +
+                        "gravity: " + res[6] + ", " +
+                        "terrain: " + res[7] + ", " +
+                        "surface_water: " + res[8] + ", " +
+                        "population: " + res[9] + "}";
+                    Console.WriteLine(body);
+                    if(rdr.GetValues(res) > 0) {
+                        return StatusCode(200, JsonConvert.SerializeObject(body));
+                    }
+                }
+                return StatusCode(404);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
 
         /// <summary>
@@ -124,23 +161,33 @@ namespace IO.Swagger.Controllers
         [ValidateModelState]
         [SwaggerOperation("GetTerrain")]
         [SwaggerResponse(statusCode: 200, type: typeof(PlanetList), description: "Successfully found planet(s)")]
-        public virtual IActionResult GetTerrain([FromRoute][Required]string terrain)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(PlanetList));
+        public async virtual Task<IActionResult> GetTerrain([FromRoute][Required]string terrain)
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("getTerrain", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400);
+                cmd.Parameters.AddWithValue("@p_terrain", terrain);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-            string exampleJson = null;
-            exampleJson = "[ {\n  \"orbital_period\" : 364,\n  \"surface_water\" : 40,\n  \"diameter\" : 12500,\n  \"gravity\" : \"1 standard\",\n  \"name\" : \"Alderaan\",\n  \"climate\" : \"temperate\",\n  \"rotation_period\" : 24,\n  \"terrain\" : \"grasslands, mountains\",\n  \"population\" : 2000000000\n}, {\n  \"orbital_period\" : 364,\n  \"surface_water\" : 40,\n  \"diameter\" : 12500,\n  \"gravity\" : \"1 standard\",\n  \"name\" : \"Alderaan\",\n  \"climate\" : \"temperate\",\n  \"rotation_period\" : 24,\n  \"terrain\" : \"grasslands, mountains\",\n  \"population\" : 2000000000\n} ]";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<PlanetList>(exampleJson)
-                        : default(PlanetList);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                string body = String.Empty;
+                while(await rdr.ReadAsync()) {
+                    object[] res = new object[rdr.FieldCount];
+                    rdr.GetValues(res);
+                    string name = "{name: " + res[0] + "},";
+                    Console.WriteLine(name);
+                    body += " " + name;
+                }
+                if(body.Length > 0) {
+                    return StatusCode(200, JsonConvert.SerializeObject("[" + body.Substring(0, body.Length - 1) + " ]"));
+                }
+                return StatusCode(404);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
 
         /// <summary>
@@ -153,20 +200,31 @@ namespace IO.Swagger.Controllers
         [ValidateModelState]
         [SwaggerOperation("GetUninhabited")]
         [SwaggerResponse(statusCode: 200, type: typeof(PlanetList), description: "Successfully found planet(s)")]
-        public virtual IActionResult GetUninhabited()
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(PlanetList));
+        public async virtual Task<IActionResult> GetUninhabited()
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("getUninhabited", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-            string exampleJson = null;
-            exampleJson = "[ {\n  \"orbital_period\" : 364,\n  \"surface_water\" : 40,\n  \"diameter\" : 12500,\n  \"gravity\" : \"1 standard\",\n  \"name\" : \"Alderaan\",\n  \"climate\" : \"temperate\",\n  \"rotation_period\" : 24,\n  \"terrain\" : \"grasslands, mountains\",\n  \"population\" : 2000000000\n}, {\n  \"orbital_period\" : 364,\n  \"surface_water\" : 40,\n  \"diameter\" : 12500,\n  \"gravity\" : \"1 standard\",\n  \"name\" : \"Alderaan\",\n  \"climate\" : \"temperate\",\n  \"rotation_period\" : 24,\n  \"terrain\" : \"grasslands, mountains\",\n  \"population\" : 2000000000\n} ]";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<PlanetList>(exampleJson)
-                        : default(PlanetList);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                string body = String.Empty;
+                while(await rdr.ReadAsync()) {
+                    object[] res = new object[rdr.FieldCount];
+                    rdr.GetValues(res);
+                    string name = "{name: " + res[0] + "},";
+                    Console.WriteLine(name);
+                    body += " " + name;
+                }
+                if(body.Length > 0) {
+                    return StatusCode(200, JsonConvert.SerializeObject("[" + body.Substring(0, body.Length - 1) + " ]"));
+                }
+                return StatusCode(404);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
 
         /// <summary>
@@ -181,21 +239,33 @@ namespace IO.Swagger.Controllers
         [Route("/planet")]
         [ValidateModelState]
         [SwaggerOperation("UpdatePlanet")]
-        public virtual IActionResult UpdatePlanet([FromBody]Planet body)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        public async virtual Task<IActionResult> UpdatePlanet([FromBody]Planet body)
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("updatePlanet", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400);
+                cmd.Parameters.AddWithValue("@p_name", body.Name);
+                cmd.Parameters.AddWithValue("@p_rotation_period", body.RotationPeriod);
+                cmd.Parameters.AddWithValue("@p_orbital_period", body.OrbitalPeriod);
+                cmd.Parameters.AddWithValue("@p_diameter", body.Diameter);
+                cmd.Parameters.AddWithValue("@p_climate", body.Climate);
+                cmd.Parameters.AddWithValue("@p_gravity", body.Gravity);
+                cmd.Parameters.AddWithValue("@p_terrain", body.Terrain);
+                cmd.Parameters.AddWithValue("@p_surface_water", body.SurfaceWater);
+                cmd.Parameters.AddWithValue("@p_population", body.Population);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-
-            //TODO: Uncomment the next line to return response 409 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(409);
-
-            throw new NotImplementedException();
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                if(rdr.RecordsAffected >= 1) {
+                    return StatusCode(200, body);
+                }
+                return StatusCode(404);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
     }
 }

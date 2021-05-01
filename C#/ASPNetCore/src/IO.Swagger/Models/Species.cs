@@ -58,10 +58,10 @@ namespace IO.Swagger.Models
         public string SkinColors { get; set; }
 
         /// <summary>
-        /// Gets or Sets HairColours
+        /// Gets or Sets HairColors
         /// </summary>
-        [DataMember(Name="hair_colours")]
-        public string HairColours { get; set; }
+        [DataMember(Name="hair_colors")]
+        public string HairColors { get; set; }
 
         /// <summary>
         /// Gets or Sets EyeColors
@@ -100,7 +100,7 @@ namespace IO.Swagger.Models
             sb.Append("  Designation: ").Append(Designation).Append("\n");
             sb.Append("  AverageHeight: ").Append(AverageHeight).Append("\n");
             sb.Append("  SkinColors: ").Append(SkinColors).Append("\n");
-            sb.Append("  HairColours: ").Append(HairColours).Append("\n");
+            sb.Append("  HairColors: ").Append(HairColors).Append("\n");
             sb.Append("  EyeColors: ").Append(EyeColors).Append("\n");
             sb.Append("  AverageLifespan: ").Append(AverageLifespan).Append("\n");
             sb.Append("  Language: ").Append(Language).Append("\n");
@@ -167,9 +167,9 @@ namespace IO.Swagger.Models
                     SkinColors.Equals(other.SkinColors)
                 ) && 
                 (
-                    HairColours == other.HairColours ||
-                    HairColours != null &&
-                    HairColours.Equals(other.HairColours)
+                    HairColors == other.HairColors ||
+                    HairColors != null &&
+                    HairColors.Equals(other.HairColors)
                 ) && 
                 (
                     EyeColors == other.EyeColors ||
@@ -213,8 +213,8 @@ namespace IO.Swagger.Models
                     hashCode = hashCode * 59 + AverageHeight.GetHashCode();
                     if (SkinColors != null)
                     hashCode = hashCode * 59 + SkinColors.GetHashCode();
-                    if (HairColours != null)
-                    hashCode = hashCode * 59 + HairColours.GetHashCode();
+                    if (HairColors != null)
+                    hashCode = hashCode * 59 + HairColors.GetHashCode();
                     if (EyeColors != null)
                     hashCode = hashCode * 59 + EyeColors.GetHashCode();
                     if (AverageLifespan != null)

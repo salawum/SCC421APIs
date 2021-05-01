@@ -731,7 +731,7 @@
             "type" : "string",
             "example" : "caucasian, black, asian, hispanic"
           },
-          "hair_colours" : {
+          "hair_colors" : {
             "type" : "string",
             "example" : "blonde, brown, black, red"
           },
@@ -762,7 +762,7 @@
           "designation" : "sentient",
           "classification" : "mammal",
           "average_lifespan" : 120,
-          "hair_colours" : "blonde, brown, black, red"
+          "hair_colors" : "blonde, brown, black, red"
         }
       },
       "SpeciesList" : {
@@ -903,7 +903,7 @@
             "type" : "string",
             "example" : "caucasian, black, asian, hispanic"
           },
-          "hair_colours" : {
+          "hair_colors" : {
             "type" : "string",
             "example" : "blonde, brown, black, red"
           },
@@ -934,7 +934,7 @@
           "designation" : "sentient",
           "classification" : "mammal",
           "average_lifespan" : 120,
-          "hair_colours" : "blonde, brown, black, red"
+          "hair_colors" : "blonde, brown, black, red"
         }
       }
     }

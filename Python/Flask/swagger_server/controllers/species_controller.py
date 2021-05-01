@@ -155,9 +155,22 @@ def get_species(name):  # noqa: E501
     try:
         conn, cur = get_conn()
         cur.callproc("starwars.getSpecies", (name,))
-        x = cur.fetchone()
-        if(x is not None and x[0] == name):
-            return Response("{'name':\"" + name + "\"}", status=200, mimetype='application/json')
+        query_response = cur.fetchone()
+        if(query_response is not None and query_response[1] == name):
+            print(query_response)
+            res = {
+                "name" : f"{query_response[1]}",
+                "classification" : f"{query_response[2]}",
+                "designation" : f"{query_response[3]}",
+                "average_height" : f"{query_response[4]}",
+                "skin_colors" : f"{query_response[5]}",
+                "hair_colours" : f"{query_response[6]}",
+                "eye_colors" : f"{query_response[7]}",
+                "average_lifespan" : f"{query_response[8]}",
+                "language" : f"{query_response[9]}",
+                "homeworld" : f"{query_response[10]}"
+            }
+            return Response(f"{res}", status=200, mimetype='application/json')
         return Response("{'status':404}", status=404, mimetype='application/json')
     except mariadb.Error as e:
         return catch_error(e)

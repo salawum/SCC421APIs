@@ -81,7 +81,7 @@ namespace IO.Swagger
                            Url = new Uri("https://github.com/swagger-api/swagger-codegen"),
                            Email = ""
                         },
-                        TermsOfService = new Uri("")
+                        //TermsOfService = new Uri("")
                     });
                     c.CustomSchemaIds(type => type.FullName);
                     c.IncludeXmlComments($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}{_hostingEnv.ApplicationName}.xml");
@@ -104,7 +104,7 @@ namespace IO.Swagger
             app.UseRouting();
 
             //TODO: Uncomment this if you need wwwroot folder
-            // app.UseStaticFiles();
+            //app.UseStaticFiles();
 
             app.UseAuthorization();
 
@@ -113,13 +113,15 @@ namespace IO.Swagger
             {
                 //TODO: Either use the SwaggerGen generated Swagger contract (generated from C# classes)
                 c.SwaggerEndpoint("/swagger/1.0.0/swagger.json", "4th Year Project");
+                c.RoutePrefix = string.Empty;
 
                 //TODO: Or alternatively use the original Swagger contract that's included in the static files
-                // c.SwaggerEndpoint("/swagger-original.json", "4th Year Project Original");
+                //c.SwaggerEndpoint("/swagger-original.json", "4th Year Project Original");
+                //c.RoutePrefix = string.Empty;
             });
 
             //TODO: Use Https Redirection
-            // app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseEndpoints(endpoints =>
             {

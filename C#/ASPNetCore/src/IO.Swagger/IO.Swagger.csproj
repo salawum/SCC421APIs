@@ -7,9 +7,9 @@
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>IO.Swagger</AssemblyName>
     <PackageId>IO.Swagger</PackageId>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="MySqlConnector" Version="1.3.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.5.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.5.1" />

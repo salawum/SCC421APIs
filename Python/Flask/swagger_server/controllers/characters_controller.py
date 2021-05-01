@@ -126,9 +126,22 @@ def get_character(name):  # noqa: E501
     try:
         conn, cur = get_conn()
         cur.callproc("starwars.getCharacter", (name,))
-        x = cur.fetchone()
-        if(x is not None and x[0] == name):
-            return Response("{'name':\"" + name + "\"}", status=200, mimetype='application/json')
+        query_response = cur.fetchone()
+        if(query_response is not None and query_response[1] == name):
+            print(query_response)
+            res = {
+                    "name" : f"{query_response[1]}",
+                    "height" : f"{query_response[2]}",
+                    "mass" : f"{query_response[3]}",
+                    "hair_color" : f"{query_response[4]}",
+                    "skin_color" : f"{query_response[5]}",
+                    "eye_color" : f"{query_response[6]}",
+                    "birth_year" : f"{query_response[7]}",
+                    "gender" : f"{query_response[8]}",
+                    "homeworld" : f"{query_response[9]}",
+                    "species" : f"{query_response[10]}"
+                }
+            return Response(f"{res}", status=200, mimetype='application/json')
         return Response("{'status':404}", status=404, mimetype='application/json')
     except mariadb.Error as e:
         return catch_error(e)

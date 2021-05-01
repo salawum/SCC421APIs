@@ -19,6 +19,10 @@ using IO.Swagger.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using IO.Swagger.Models;
 
+using MySqlConnector;
+using System.Data;
+using System.Threading.Tasks;
+
 namespace IO.Swagger.Controllers
 { 
     /// <summary>
@@ -39,21 +43,31 @@ namespace IO.Swagger.Controllers
         [Route("/species")]
         [ValidateModelState]
         [SwaggerOperation("AddSpecies")]
-        public virtual IActionResult AddSpecies([FromBody]Species body)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        public async virtual Task<IActionResult> AddSpecies([FromBody]Species body)
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("addSpecies", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400);
+                cmd.Parameters.AddWithValue("@s_name", body.Name);
+                cmd.Parameters.AddWithValue("@s_classification", body.Classification);
+                cmd.Parameters.AddWithValue("@s_designation", body.Designation);
+                cmd.Parameters.AddWithValue("@s_average_height", body.AverageHeight);
+                cmd.Parameters.AddWithValue("@s_skin_colors", body.SkinColors);
+                cmd.Parameters.AddWithValue("@s_hair_colors", body.HairColors);
+                cmd.Parameters.AddWithValue("@s_eye_colors", body.EyeColors);
+                cmd.Parameters.AddWithValue("@s_average_lifespan", body.AverageLifespan);
+                cmd.Parameters.AddWithValue("@s_language", body.Language);
+                cmd.Parameters.AddWithValue("@s_homeworld", body.Homeworld);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-
-            //TODO: Uncomment the next line to return response 409 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(409);
-
-            throw new NotImplementedException();
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                return StatusCode(200, body);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
 
         /// <summary>
@@ -67,24 +81,31 @@ namespace IO.Swagger.Controllers
         [Route("/species/{name}")]
         [ValidateModelState]
         [SwaggerOperation("DeleteSpecies")]
-        public virtual IActionResult DeleteSpecies([FromRoute][Required]string name)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        public async virtual Task<IActionResult> DeleteSpecies([FromRoute][Required]string name)
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("deleteSpecies", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400);
+                cmd.Parameters.AddWithValue("@s_name", name);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-
-            throw new NotImplementedException();
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                if(rdr.RecordsAffected >= 1) {
+                    return StatusCode(200);
+                }
+                return StatusCode(404);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
 
         /// <summary>
         /// Get a list of species with the specified eye color
         /// </summary>
-        /// <param name="eyeColor"></param>
+        /// <param name="eye_color"></param>
         /// <response code="200">Successfully found species(s)</response>
         /// <response code="400">Invalid eye color supplied</response>
         /// <response code="404">Species(s) not found</response>
@@ -93,23 +114,33 @@ namespace IO.Swagger.Controllers
         [ValidateModelState]
         [SwaggerOperation("GetEyeColor")]
         [SwaggerResponse(statusCode: 200, type: typeof(SpeciesList), description: "Successfully found species(s)")]
-        public virtual IActionResult GetEyeColor([FromRoute][Required]string eyeColor)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(SpeciesList));
+        public async virtual Task<IActionResult> GetEyeColor([FromRoute][Required]string eye_color)
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("getEyeColor", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400);
+                cmd.Parameters.AddWithValue("@s_eye_color", eye_color);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-            string exampleJson = null;
-            exampleJson = "[ {\n  \"average_height\" : 180,\n  \"skin_colors\" : \"caucasian, black, asian, hispanic\",\n  \"homeworld\" : \"Coruscant\",\n  \"name\" : \"Human\",\n  \"eye_colors\" : \"brown, blue, green, hazel, grey, amber\",\n  \"language\" : \"Galactic Basic\",\n  \"designation\" : \"sentient\",\n  \"classification\" : \"mammal\",\n  \"average_lifespan\" : 120,\n  \"hair_colours\" : \"blonde, brown, black, red\"\n}, {\n  \"average_height\" : 180,\n  \"skin_colors\" : \"caucasian, black, asian, hispanic\",\n  \"homeworld\" : \"Coruscant\",\n  \"name\" : \"Human\",\n  \"eye_colors\" : \"brown, blue, green, hazel, grey, amber\",\n  \"language\" : \"Galactic Basic\",\n  \"designation\" : \"sentient\",\n  \"classification\" : \"mammal\",\n  \"average_lifespan\" : 120,\n  \"hair_colours\" : \"blonde, brown, black, red\"\n} ]";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<SpeciesList>(exampleJson)
-                        : default(SpeciesList);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                string body = String.Empty;
+                while(await rdr.ReadAsync()) {
+                    object[] res = new object[rdr.FieldCount];
+                    rdr.GetValues(res);
+                    string name = "{name: " + res[0] + "},";
+                    Console.WriteLine(name);
+                    body += " " + name;
+                }
+                if(body.Length > 0) {
+                    return StatusCode(200, JsonConvert.SerializeObject("[" + body.Substring(0, body.Length - 1) + " ]"));
+                }
+                return StatusCode(404);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
 
         /// <summary>
@@ -124,23 +155,41 @@ namespace IO.Swagger.Controllers
         [ValidateModelState]
         [SwaggerOperation("GetSpecies")]
         [SwaggerResponse(statusCode: 200, type: typeof(Species), description: "Successfully found Species object")]
-        public virtual IActionResult GetSpecies([FromRoute][Required]string name)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Species));
+        public async virtual Task<IActionResult> GetSpecies([FromRoute][Required]string name)
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("getSpecies", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400);
+                cmd.Parameters.AddWithValue("@s_name", name);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-            string exampleJson = null;
-            exampleJson = "{\n  \"average_height\" : 180,\n  \"skin_colors\" : \"caucasian, black, asian, hispanic\",\n  \"homeworld\" : \"Coruscant\",\n  \"name\" : \"Human\",\n  \"eye_colors\" : \"brown, blue, green, hazel, grey, amber\",\n  \"language\" : \"Galactic Basic\",\n  \"designation\" : \"sentient\",\n  \"classification\" : \"mammal\",\n  \"average_lifespan\" : 120,\n  \"hair_colours\" : \"blonde, brown, black, red\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Species>(exampleJson)
-                        : default(Species);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                while(await rdr.ReadAsync()) {
+                    object[] res = new object[rdr.FieldCount];
+                    rdr.GetValues(res);
+                    string body =
+                        "{name: " + res[1] + ", " +
+                        "classification: " + res[2] + ", " +
+                        "designation: " + res[3] + ", " +
+                        "average_height: " + res[4] + ", " +
+                        "skin_colors: " + res[5] + ", " +
+                        "hair_colors: " + res[6] + ", " +
+                        "eye_colors: " + res[7] + ", " +
+                        "average_height: " + res[8] + ", " +
+                        "language: " + res[9] + ", " +
+                        "homeworld: " + res[10] + "}";
+                    Console.WriteLine(body);
+                    if(rdr.GetValues(res) > 0) {
+                        return StatusCode(200, JsonConvert.SerializeObject(body));
+                    }
+                }
+                return StatusCode(404);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
 
         /// <summary>
@@ -155,21 +204,34 @@ namespace IO.Swagger.Controllers
         [Route("/species")]
         [ValidateModelState]
         [SwaggerOperation("UpdateSpecies")]
-        public virtual IActionResult UpdateSpecies([FromBody]Species body)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        public async virtual Task<IActionResult> UpdateSpecies([FromBody]Species body)
+        {
+            try {
+                using var conn = new MySqlConnection(HelperFunctions.getConnString());
+                using var cmd = new MySqlCommand("updateSpecies", conn) {
+                    CommandType = CommandType.StoredProcedure
+                };
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400);
+                cmd.Parameters.AddWithValue("@s_name", body.Name);
+                cmd.Parameters.AddWithValue("@s_classification", body.Classification);
+                cmd.Parameters.AddWithValue("@s_designation", body.Designation);
+                cmd.Parameters.AddWithValue("@s_average_height", body.AverageHeight);
+                cmd.Parameters.AddWithValue("@s_skin_colors", body.SkinColors);
+                cmd.Parameters.AddWithValue("@s_hair_colors", body.HairColors);
+                cmd.Parameters.AddWithValue("@s_eye_colors", body.EyeColors);
+                cmd.Parameters.AddWithValue("@s_average_lifespan", body.AverageLifespan);
+                cmd.Parameters.AddWithValue("@s_language", body.Language);
+                cmd.Parameters.AddWithValue("@s_homeworld", body.Homeworld);
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404);
-
-            //TODO: Uncomment the next line to return response 409 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(409);
-
-            throw new NotImplementedException();
+                await conn.OpenAsync();
+                MySqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                if(rdr.RecordsAffected >= 1) {
+                    return StatusCode(200, body);
+                }
+                return StatusCode(404);
+            } catch(Exception ex) {
+                return HelperFunctions.ErrorStatusCode(ex);
+            }
         }
     }
 }

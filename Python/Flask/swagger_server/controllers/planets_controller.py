@@ -125,9 +125,21 @@ def get_planet(name):  # noqa: E501
     try:
         conn, cur = get_conn()
         cur.callproc("starwars.getPlanet", (name,))
-        x = cur.fetchone()
-        if(x is not None and x[0] == name):
-            return Response("{'name':\"" + name + "\"}", status=200, mimetype='application/json')
+        query_response = cur.fetchone()
+        if(query_response is not None and query_response[1] == name):
+            print(query_response)
+            res = {
+                "name" : f"{query_response[1]}",
+                "rotation_period" : f"{query_response[2]}",
+                "orbital_period" : f"{query_response[3]}",
+                "diameter" : f"{query_response[4]}",
+                "climate" : f"{query_response[5]}",
+                "gravity" : f"{query_response[6]}",
+                "terrain" : f"{query_response[7]}",
+                "surface_water" : f"{query_response[8]}",
+                "population" : f"{query_response[9]}"
+            }
+            return Response(f"{res}", status=200, mimetype='application/json')
         return Response("{'status':404}", status=404, mimetype='application/json')
     except mariadb.Error as e:
         return catch_error(e)
