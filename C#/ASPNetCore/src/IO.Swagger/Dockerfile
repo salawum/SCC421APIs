@@ -14,9 +14,10 @@ RUN dotnet publish -c Release -o out
 
 # build runtime image
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
-# WORKDIR /app
-# COPY --from=build-env /app/out .
+
 WORKDIR /usr/src/app
 COPY --from=build-env /usr/src/app/out .
 
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "IO.Swagger.dll"]
+CMD ["run", "-p", "src/IO.Swagger/IO.Swagger.csproj", "--launch-profile", "web"]

@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=starwars
+      - DB_PWD=starwars
+      - DB_DATABASE=starwars
+      - DB_PORT=3306
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ServiceHost=localhost
+      - ServicePort=8080
+      - applicationUrl=https://localhost:8081;http://localhost:8080
+    ports:
+      - 8080:8080
+  
+  db:
+    image: ghcr.io/linuxserver/mariadb
+    expose:
+      - 3306
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_ROOT_PASSWORD=helloworld
+      - TZ=Europe/London
+      - MYSQL_DATABASE=starwars
+      - MYSQL_USER=starwars
+      - MYSQL_PASSWORD=starwars
+    volumes:
+      - /home/bubsy/docker/db:/config
+
+  phpmyadmin:
+    image: phpmyadmin
+    depends_on:
+      - db
+    ports:
+      - 8888:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=helloworld
+
+  
