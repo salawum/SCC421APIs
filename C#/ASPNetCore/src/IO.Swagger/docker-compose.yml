@@ -7,18 +7,8 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - db
-    environment:
-      - DB_HOST=db
-      - DB_USER=starwars
-      - DB_PWD=starwars
-      - DB_DATABASE=starwars
-      - DB_PORT=3306
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ServiceHost=localhost
-      - ServicePort=8080
-      - applicationUrl=https://localhost:8081;http://localhost:8080
     ports:
-      - 8080:8080
+      - 8080:80
   
   db:
     image: ghcr.io/linuxserver/mariadb
