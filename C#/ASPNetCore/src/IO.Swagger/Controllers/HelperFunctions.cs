@@ -57,6 +57,7 @@ namespace IO.Swagger.Controllers {
                 return;
 
             foreach(var line in File.ReadAllLines(filePath)) {
+                Console.WriteLine(filePath);
                 var parts = line.Split('=', StringSplitOptions.RemoveEmptyEntries);
 
                 if(parts.Length != 2) {
