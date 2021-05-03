@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore;
+using System.IO;
+using IO.Swagger.Controllers;
 
 namespace IO.Swagger
 {
@@ -14,6 +16,10 @@ namespace IO.Swagger
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
+            var root = Directory.GetCurrentDirectory();
+            var dotenv = Path.Combine(root, ".env");
+            HelperFunctions.Load(dotenv);
+
             CreateWebHostBuilder(args).Build().Run();
         }
 
