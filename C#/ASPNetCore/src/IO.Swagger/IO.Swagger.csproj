@@ -3,6 +3,7 @@
     <Description>IO.Swagger</Description>
     <Copyright>IO.Swagger</Copyright>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>IO.Swagger</AssemblyName>
