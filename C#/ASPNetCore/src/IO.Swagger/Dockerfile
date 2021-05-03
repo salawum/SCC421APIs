@@ -10,6 +10,7 @@ RUN dotnet restore
 
 # copy everything else and build
 COPY . ./
+COPY .env ./usr/src/app/.env
 RUN dotnet publish -c Release -o out
 
 # build runtime image
