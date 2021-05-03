@@ -53,8 +53,10 @@ namespace IO.Swagger.Controllers {
         /// </summary>
         /// <param name="filePath">Path to the .env file</param>
         public static void Load(string filePath) {
-            if(!File.Exists(filePath))
+            if(!File.Exists(filePath)) {
+                Console.WriteLine("File doesn't exist: {0}", filePath);
                 return;
+            }
 
             Console.WriteLine(filePath);
             foreach(var line in File.ReadAllLines(filePath)) {
