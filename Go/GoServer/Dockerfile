@@ -2,7 +2,7 @@ FROM golang:latest AS build
 WORKDIR /go/src
 COPY go ./go
 COPY main.go .
-COPY .env /go/src/.env
+COPY .env .
 
 ENV CGO_ENABLED=0
 ENV GO111MODULE=off
@@ -12,7 +12,7 @@ RUN go build -a -installsuffix cgo -o swagger .
 
 FROM scratch AS runtime
 COPY --from=build /go/src/swagger ./
-COPY .env /go/src/.env
+COPY .env .
 
 EXPOSE 8080
 ENTRYPOINT ["./swagger"]
