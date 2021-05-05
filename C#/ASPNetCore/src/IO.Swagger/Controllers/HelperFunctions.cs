@@ -27,7 +27,6 @@ namespace IO.Swagger.Controllers {
                         case "1046":
                             return new StatusCodeResult(404);
                         default:
-                            Console.WriteLine("2");
                             return new StatusCodeResult(400);
                     }
                 }
