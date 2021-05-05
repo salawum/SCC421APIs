@@ -19,7 +19,6 @@ import (
 )
 
 func AddCharacter(w http.ResponseWriter, r *http.Request) {
-        println(GetDBString())
 	db, err := sql.Open("mysql", GetDBString())
 	if err != nil {
 		panic(err)
