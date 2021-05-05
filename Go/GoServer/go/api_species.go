@@ -9,30 +9,179 @@
 package swagger
 
 import (
+	"database/sql"
+	"encoding/json"
 	"net/http"
+	"strings"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func AddSpecies(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	var s Species
+	json.NewDecoder(r.Body).Decode(&s)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	res, err := db.Query("CALL addSpecies(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		s.Name, s.Classification, s.Designation, s.AverageHeight, s.SkinColors,
+		s.HairColors, s.EyeColors, s.AverageLifespan, s.Language, s.Homeworld)
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(s)
+	defer res.Close()
 }
 
 func DeleteSpecies(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	name := strings.ReplaceAll(r.RequestURI, "/species/", "")
+
+	res, err := db.Exec("CALL deleteSpecies(?)", name)
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+		return
+	} else {
+		if affected, err := res.RowsAffected(); err != nil {
+			res_writer, msg, code := HandleError(w, string(err.Error()))
+			http.Error(res_writer, msg, code)
+			return
+		} else if affected == 0 {
+			http.Error(w, "Species not found", 404)
+			return
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
 }
 
 func GetEyeColor(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	var eyeColor string = strings.ReplaceAll(r.RequestURI, "/species/eye/", "")
+
+	res, err := db.Query("CALL getEyeColor(?)", eyeColor)
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+		return
+	} else {
+		var s_list []string
+		for res.Next() {
+			var name string
+			err = res.Scan(&name)
+			if err != nil {
+				println(err.Error())
+			} else if name != "" {
+				s_list = append(s_list, name)
+			}
+		}
+		if len(s_list) != 0 {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(s_list)
+			defer res.Close()
+			return
+		}
+		http.Error(w, "No species found with specified eye color", 404)
+		return
+	}
 }
 
 func GetSpecies(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	name := strings.ReplaceAll(r.RequestURI, "/species/", "")
+
+	res, err := db.Query("CALL getSpecies(?)", name)
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+		return
+	} else {
+		if res.Next() {
+			var species Species
+			var id int
+			err = res.Scan(
+				&id, &species.Name, &species.Classification, &species.Designation, &species.AverageHeight, &species.SkinColors,
+				&species.HairColors, &species.EyeColors, &species.AverageLifespan, &species.Language, &species.Homeworld)
+			if err != nil {
+				res_writer, msg, code := HandleError(w, string(err.Error()))
+				http.Error(res_writer, msg, code)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(species)
+			defer res.Close()
+			return
+		} else {
+			http.Error(w, "Species not found", 404)
+			return
+		}
+	}
 }
 
 func UpdateSpecies(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	var s Species
+	json.NewDecoder(r.Body).Decode(&s)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	res, err := db.Exec("CALL updateSpecies(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		s.Name, s.Classification, s.Designation, s.AverageHeight, s.SkinColors,
+		s.HairColors, s.EyeColors, s.AverageLifespan, s.Language, s.Homeworld)
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+	} else {
+		if affected, err := res.RowsAffected(); err != nil {
+			res_writer, msg, code := HandleError(w, string(err.Error()))
+			http.Error(res_writer, msg, code)
+		} else {
+			if affected == 0 {
+				http.Error(w, "Species not found or has already been updated", 404)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(s)
+			return
+		}
+	}
 }

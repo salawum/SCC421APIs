@@ -67,7 +67,7 @@ func DeleteCharacter(w http.ResponseWriter, r *http.Request) {
 			http.Error(res_writer, msg, code)
 			return
 		} else if affected == 0 {
-			http.Error(w, "Name not found", 404)
+			http.Error(w, "Character not found", 404)
 			return
 		}
 	}
@@ -93,9 +93,9 @@ func GetCharacter(w http.ResponseWriter, r *http.Request) {
 	} else {
 		if res.Next() {
 			var character Character
-			var x int
+			var id int
 			err = res.Scan(
-				&x, &character.Name, &character.Height, &character.Mass, &character.HairColor, &character.SkinColor, &character.EyeColor,
+				&id, &character.Name, &character.Height, &character.Mass, &character.HairColor, &character.SkinColor, &character.EyeColor,
 				&character.BirthYear, &character.Gender, &character.Homeworld, &character.Species)
 			if err != nil {
 				res_writer, msg, code := HandleError(w, string(err.Error()))
@@ -107,7 +107,7 @@ func GetCharacter(w http.ResponseWriter, r *http.Request) {
 			defer res.Close()
 			return
 		} else {
-			http.Error(w, "Name not found", 404)
+			http.Error(w, "Character not found", 404)
 			return
 		}
 	}
@@ -182,7 +182,7 @@ func UpdateCharacter(w http.ResponseWriter, r *http.Request) {
 			http.Error(res_writer, msg, code)
 		} else {
 			if affected == 0 {
-				http.Error(w, "Name not found or has already been updated", 404)
+				http.Error(w, "Character not found or has already been updated", 404)
 				return
 			}
 			w.WriteHeader(http.StatusOK)

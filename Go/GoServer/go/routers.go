@@ -126,6 +126,13 @@ var routes = Routes{
 	},
 
 	Route{
+		"GetUninhabited",
+		strings.ToUpper("Get"),
+		"/planet/uninhabited",
+		GetUninhabited,
+	},
+
+	Route{
 		"GetPlanet",
 		strings.ToUpper("Get"),
 		"/planet/{name}",
@@ -137,13 +144,6 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/planet/terrain/{terrain}",
 		GetTerrain,
-	},
-
-	Route{
-		"GetUninhabited",
-		strings.ToUpper("Get"),
-		"/planet/uninhabited",
-		GetUninhabited,
 	},
 
 	Route{

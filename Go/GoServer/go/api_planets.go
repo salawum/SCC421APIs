@@ -9,35 +9,215 @@
 package swagger
 
 import (
+	"database/sql"
+	"encoding/json"
 	"net/http"
+	"strings"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func AddPlanet(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	var p Planet
+	json.NewDecoder(r.Body).Decode(&p)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	res, err := db.Query("CALL addPlanet(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		p.Name, p.RotationPeriod, p.OrbitalPeriod, p.Diameter,
+		p.Climate, p.Gravity, p.Terrain, p.SurfaceWater, p.Population)
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(p)
+	defer res.Close()
 }
 
 func DeletePlanet(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	name := strings.ReplaceAll(r.RequestURI, "/planet/", "")
+
+	res, err := db.Exec("CALL deletePlanet(?)", name)
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+		return
+	} else {
+		if affected, err := res.RowsAffected(); err != nil {
+			res_writer, msg, code := HandleError(w, string(err.Error()))
+			http.Error(res_writer, msg, code)
+			return
+		} else if affected == 0 {
+			http.Error(w, "Planet not found", 404)
+			return
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
 }
 
 func GetPlanet(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	name := strings.ReplaceAll(r.RequestURI, "/planet/", "")
+
+	res, err := db.Query("CALL getPlanet(?)", name)
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+		return
+	} else {
+		if res.Next() {
+			var planet Planet
+			var id int
+			err = res.Scan(
+				&id, &planet.Name, &planet.RotationPeriod, &planet.OrbitalPeriod, &planet.Diameter, &planet.Climate,
+				&planet.Gravity, &planet.Terrain, &planet.SurfaceWater, &planet.Population)
+			if err != nil {
+				res_writer, msg, code := HandleError(w, string(err.Error()))
+				http.Error(res_writer, msg, code)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(planet)
+			defer res.Close()
+			return
+		} else {
+			http.Error(w, "Planet not found", 404)
+			return
+		}
+	}
 }
 
 func GetTerrain(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	var terrain string = strings.ReplaceAll(r.RequestURI, "/planet/terrain/", "")
+
+	res, err := db.Query("CALL getTerrain(?)", terrain)
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+		return
+	} else {
+		var p_list []string
+		for res.Next() {
+			var name string
+			err = res.Scan(&name)
+			if err != nil {
+				println(err.Error())
+			} else if name != "" {
+				p_list = append(p_list, name)
+			}
+		}
+		if len(p_list) != 0 {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(p_list)
+			defer res.Close()
+			return
+		}
+		http.Error(w, "No planets found with specified terrain", 404)
+		return
+	}
 }
 
 func GetUninhabited(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+
+	res, err := db.Query("CALL getUninhabited()")
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+		return
+	} else {
+		var p_list []string
+		for res.Next() {
+			var name string
+			err = res.Scan(&name)
+			if err != nil {
+				println(err.Error())
+			} else if name != "" {
+				p_list = append(p_list, name)
+			}
+		}
+		if len(p_list) != 0 {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(p_list)
+			defer res.Close()
+			return
+		}
+		http.Error(w, "No planets found", 404)
+		return
+	}
 }
 
 func UpdatePlanet(w http.ResponseWriter, r *http.Request) {
+	db, err := sql.Open("mysql", GetDBString())
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	var p Planet
+	json.NewDecoder(r.Body).Decode(&p)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	res, err := db.Exec("CALL updatePlanet(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		p.Name, p.RotationPeriod, p.OrbitalPeriod, p.Diameter,
+		p.Climate, p.Gravity, p.Terrain, p.SurfaceWater, p.Population)
+	if err != nil {
+		res_writer, msg, code := HandleError(w, string(err.Error()))
+		http.Error(res_writer, msg, code)
+	} else {
+		if affected, err := res.RowsAffected(); err != nil {
+			res_writer, msg, code := HandleError(w, string(err.Error()))
+			http.Error(res_writer, msg, code)
+		} else {
+			if affected == 0 {
+				http.Error(w, "Planet not found or has already been updated", 404)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(p)
+			return
+		}
+	}
 }
