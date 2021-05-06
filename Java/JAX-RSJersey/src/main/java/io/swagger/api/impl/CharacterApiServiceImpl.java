@@ -1,15 +1,12 @@
 package io.swagger.api.impl;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
-import java.sql.*;
-
 import io.swagger.api.*;
 import io.swagger.model.*;
 
 import io.swagger.model.Character;
 import io.swagger.model.CharacterList;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
@@ -32,8 +29,8 @@ import javax.validation.constraints.*;
         ResultSet rs = null;
         try {
             conn = DriverManager.getConnection(HelperFunctions.getConnectionString());
-
             CallableStatement cStmt = conn.prepareCall("{CALL addCharacter(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
+
             cStmt.setString(1, body.getName());
             cStmt.setInt(2, body.getHeight());
             cStmt.setBigDecimal(3, body.getMass());
@@ -59,7 +56,6 @@ import javax.validation.constraints.*;
         ResultSet rs = null;
         try {
             conn = DriverManager.getConnection(HelperFunctions.getConnectionString());
-
             CallableStatement cStmt = conn.prepareCall("{CALL deleteCharacter(?)}");
             cStmt.setString(1, name);
 
@@ -152,8 +148,8 @@ import javax.validation.constraints.*;
         ResultSet rs = null;
         try {
             conn = DriverManager.getConnection(HelperFunctions.getConnectionString());
-
             CallableStatement cStmt = conn.prepareCall("{CALL updateCharacter(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
+
             cStmt.setString(1, body.getName());
             cStmt.setInt(2, body.getHeight());
             cStmt.setBigDecimal(3, body.getMass());

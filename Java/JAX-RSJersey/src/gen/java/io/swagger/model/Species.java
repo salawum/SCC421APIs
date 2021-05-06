@@ -45,7 +45,7 @@ import javax.validation.Valid;
   private String eyeColors = null;
 
   @JsonProperty("average_lifespan")
-  private Integer averageLifespan = null;
+  private String averageLifespan = null;
 
   @JsonProperty("language")
   private String language = null;
@@ -187,7 +187,7 @@ import javax.validation.Valid;
     this.eyeColors = eyeColors;
   }
 
-  public Species averageLifespan(Integer averageLifespan) {
+  public Species averageLifespan(String averageLifespan) {
     this.averageLifespan = averageLifespan;
     return this;
   }
@@ -198,11 +198,11 @@ import javax.validation.Valid;
    **/
   @JsonProperty("average_lifespan")
   @Schema(example = "120", description = "")
-  public Integer getAverageLifespan() {
+  public String getAverageLifespan() {
     return averageLifespan;
   }
 
-  public void setAverageLifespan(Integer averageLifespan) {
+  public void setAverageLifespan(String averageLifespan) {
     this.averageLifespan = averageLifespan;
   }
 
