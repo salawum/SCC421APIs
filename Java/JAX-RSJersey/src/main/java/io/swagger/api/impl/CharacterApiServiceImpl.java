@@ -23,7 +23,6 @@ import javax.validation.constraints.*;
     @Override
     public Response addCharacter(Character body, SecurityContext securityContext) throws NotFoundException {
         System.out.println("addCharacter");
-        System.out.println(HelperFunctions.getConnectionString());
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
