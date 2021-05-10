@@ -42,4 +42,12 @@ services:
       - PMA_USER=root
       - PMA_PASSWORD=helloworld
 
+  revproxy:
+    container_name: revproxy
+    hostname: revproxy
+    image: nginx
+    ports:
+      - 90:90
+    volumes:
+      - /home/bubsy/docker/revproxy:/etc/nginx
   
