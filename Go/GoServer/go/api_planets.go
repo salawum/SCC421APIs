@@ -22,6 +22,7 @@ func AddPlanet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	db.SetMaxOpenConns(100)
 	defer db.Close()
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -48,6 +49,7 @@ func AddPlanet(w http.ResponseWriter, r *http.Request) {
 
 func DeletePlanet(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
+	db.SetMaxOpenConns(100)
 	if err != nil {
 		panic(err)
 	}
@@ -77,6 +79,7 @@ func DeletePlanet(w http.ResponseWriter, r *http.Request) {
 
 func GetPlanet(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
+	db.SetMaxOpenConns(100)
 	if err != nil {
 		panic(err)
 	}
@@ -117,6 +120,7 @@ func GetPlanet(w http.ResponseWriter, r *http.Request) {
 
 func GetTerrain(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
+	db.SetMaxOpenConns(100)
 	if err != nil {
 		panic(err)
 	}
@@ -157,6 +161,7 @@ func GetTerrain(w http.ResponseWriter, r *http.Request) {
 
 func GetUninhabited(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
+	db.SetMaxOpenConns(100)
 	if err != nil {
 		panic(err)
 	}
@@ -195,6 +200,7 @@ func GetUninhabited(w http.ResponseWriter, r *http.Request) {
 
 func UpdatePlanet(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
+	db.SetMaxOpenConns(100)
 	if err != nil {
 		panic(err)
 	}
