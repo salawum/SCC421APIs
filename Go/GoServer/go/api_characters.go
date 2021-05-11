@@ -20,7 +20,7 @@ import (
 
 func AddCharacter(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
-	db.SetMaxOpenConns(100)
+
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +50,7 @@ func AddCharacter(w http.ResponseWriter, r *http.Request) {
 
 func DeleteCharacter(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
-	db.SetMaxOpenConns(100)
+
 	if err != nil {
 		panic(err)
 	}
@@ -80,7 +80,7 @@ func DeleteCharacter(w http.ResponseWriter, r *http.Request) {
 
 func GetCharacter(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
-	db.SetMaxOpenConns(100)
+
 	if err != nil {
 		panic(err)
 	}
@@ -121,7 +121,7 @@ func GetCharacter(w http.ResponseWriter, r *http.Request) {
 
 func GetMass(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
-	db.SetMaxOpenConns(100)
+
 	if err != nil {
 		panic(err)
 	}
@@ -167,7 +167,7 @@ func GetMass(w http.ResponseWriter, r *http.Request) {
 
 func UpdateCharacter(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
-	db.SetMaxOpenConns(100)
+
 	if err != nil {
 		panic(err)
 	}

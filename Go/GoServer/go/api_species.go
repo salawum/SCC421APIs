@@ -19,7 +19,7 @@ import (
 
 func AddSpecies(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
-	db.SetMaxOpenConns(100)
+
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +49,7 @@ func AddSpecies(w http.ResponseWriter, r *http.Request) {
 
 func DeleteSpecies(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
-	db.SetMaxOpenConns(100)
+
 	if err != nil {
 		panic(err)
 	}
@@ -79,7 +79,7 @@ func DeleteSpecies(w http.ResponseWriter, r *http.Request) {
 
 func GetEyeColor(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
-	db.SetMaxOpenConns(100)
+
 	if err != nil {
 		panic(err)
 	}
@@ -120,7 +120,7 @@ func GetEyeColor(w http.ResponseWriter, r *http.Request) {
 
 func GetSpecies(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
-	db.SetMaxOpenConns(100)
+
 	if err != nil {
 		panic(err)
 	}
@@ -161,7 +161,7 @@ func GetSpecies(w http.ResponseWriter, r *http.Request) {
 
 func UpdateSpecies(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("mysql", GetDBString())
-	db.SetMaxOpenConns(100)
+
 	if err != nil {
 		panic(err)
 	}
