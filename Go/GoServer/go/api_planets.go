@@ -37,12 +37,13 @@ func AddPlanet(w http.ResponseWriter, r *http.Request) {
 		p.Climate, p.Gravity, p.Terrain, p.SurfaceWater, p.Population)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
+		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	}
+	defer res.Close()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(p)
-	defer res.Close()
 }
 
 func DeletePlanet(w http.ResponseWriter, r *http.Request) {
@@ -87,6 +88,7 @@ func GetPlanet(w http.ResponseWriter, r *http.Request) {
 	res, err := db.Query("CALL getPlanet(?)", name)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
+		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	} else {
@@ -98,14 +100,15 @@ func GetPlanet(w http.ResponseWriter, r *http.Request) {
 				&planet.Gravity, &planet.Terrain, &planet.SurfaceWater, &planet.Population)
 			if err != nil {
 				res_writer, msg, code := HandleError(w, string(err.Error()))
+				defer res.Close()
 				http.Error(res_writer, msg, code)
 				return
 			}
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(planet)
-			defer res.Close()
 			return
 		} else {
+			defer res.Close()
 			http.Error(w, "Planet not found", 404)
 			return
 		}
@@ -125,6 +128,7 @@ func GetTerrain(w http.ResponseWriter, r *http.Request) {
 	res, err := db.Query("CALL getTerrain(?)", terrain)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
+		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	} else {
@@ -133,17 +137,19 @@ func GetTerrain(w http.ResponseWriter, r *http.Request) {
 			var name string
 			err = res.Scan(&name)
 			if err != nil {
+				defer res.Close()
 				println(err.Error())
 			} else if name != "" {
 				p_list = append(p_list, name)
 			}
 		}
 		if len(p_list) != 0 {
+			defer res.Close()
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(p_list)
-			defer res.Close()
 			return
 		}
+		defer res.Close()
 		http.Error(w, "No planets found with specified terrain", 404)
 		return
 	}
@@ -161,6 +167,7 @@ func GetUninhabited(w http.ResponseWriter, r *http.Request) {
 	res, err := db.Query("CALL getUninhabited()")
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
+		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	} else {
@@ -175,11 +182,12 @@ func GetUninhabited(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if len(p_list) != 0 {
+			defer res.Close()
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(p_list)
-			defer res.Close()
 			return
 		}
+		defer res.Close()
 		http.Error(w, "No planets found", 404)
 		return
 	}

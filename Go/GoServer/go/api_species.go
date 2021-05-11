@@ -37,12 +37,13 @@ func AddSpecies(w http.ResponseWriter, r *http.Request) {
 		s.HairColors, s.EyeColors, s.AverageLifespan, s.Language, s.Homeworld)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
+		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	}
+	defer res.Close()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(s)
-	defer res.Close()
 }
 
 func DeleteSpecies(w http.ResponseWriter, r *http.Request) {
@@ -87,6 +88,7 @@ func GetEyeColor(w http.ResponseWriter, r *http.Request) {
 	res, err := db.Query("CALL getEyeColor(?)", eyeColor)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
+		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	} else {
@@ -95,17 +97,19 @@ func GetEyeColor(w http.ResponseWriter, r *http.Request) {
 			var name string
 			err = res.Scan(&name)
 			if err != nil {
+				defer res.Close()
 				println(err.Error())
 			} else if name != "" {
 				s_list = append(s_list, name)
 			}
 		}
 		if len(s_list) != 0 {
+			defer res.Close()
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(s_list)
-			defer res.Close()
 			return
 		}
+		defer res.Close()
 		http.Error(w, "No species found with specified eye color", 404)
 		return
 	}
@@ -124,6 +128,7 @@ func GetSpecies(w http.ResponseWriter, r *http.Request) {
 	res, err := db.Query("CALL getSpecies(?)", name)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
+		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	} else {
@@ -135,12 +140,13 @@ func GetSpecies(w http.ResponseWriter, r *http.Request) {
 				&species.HairColors, &species.EyeColors, &species.AverageLifespan, &species.Language, &species.Homeworld)
 			if err != nil {
 				res_writer, msg, code := HandleError(w, string(err.Error()))
+				defer res.Close()
 				http.Error(res_writer, msg, code)
 				return
 			}
+			defer res.Close()
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(species)
-			defer res.Close()
 			return
 		} else {
 			http.Error(w, "Species not found", 404)

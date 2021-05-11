@@ -38,12 +38,13 @@ func AddCharacter(w http.ResponseWriter, r *http.Request) {
 		c.BirthYear, c.Gender, c.Homeworld, c.Species)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
+		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	}
+	defer res.Close()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(c)
-	defer res.Close()
 }
 
 func DeleteCharacter(w http.ResponseWriter, r *http.Request) {
@@ -88,6 +89,7 @@ func GetCharacter(w http.ResponseWriter, r *http.Request) {
 	res, err := db.Query("CALL getCharacter(?)", name)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
+		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	} else {
@@ -99,14 +101,15 @@ func GetCharacter(w http.ResponseWriter, r *http.Request) {
 				&character.BirthYear, &character.Gender, &character.Homeworld, &character.Species)
 			if err != nil {
 				res_writer, msg, code := HandleError(w, string(err.Error()))
+				defer res.Close()
 				http.Error(res_writer, msg, code)
 				return
 			}
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(character)
-			defer res.Close()
 			return
 		} else {
+			defer res.Close()
 			http.Error(w, "Character not found", 404)
 			return
 		}
@@ -131,6 +134,7 @@ func GetMass(w http.ResponseWriter, r *http.Request) {
 	res, err := db.Query("CALL getMass(?)", mass)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
+		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	} else {
@@ -139,17 +143,19 @@ func GetMass(w http.ResponseWriter, r *http.Request) {
 			var name string
 			err = res.Scan(&name)
 			if err != nil {
+				defer res.Close()
 				println(err.Error())
 			} else if name != "" {
 				c_list = append(c_list, name)
 			}
 		}
 		if len(c_list) != 0 {
+			defer res.Close()
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(c_list)
-			defer res.Close()
 			return
 		}
+		defer res.Close()
 		http.Error(w, "No characters found with specified mass", 404)
 		return
 	}
