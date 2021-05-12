@@ -38,7 +38,6 @@ func AddPlanet(w http.ResponseWriter, r *http.Request) {
 		p.Climate, p.Gravity, p.Terrain, p.SurfaceWater, p.Population)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
-		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	}

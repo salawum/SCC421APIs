@@ -38,7 +38,6 @@ func AddSpecies(w http.ResponseWriter, r *http.Request) {
 		s.HairColors, s.EyeColors, s.AverageLifespan, s.Language, s.Homeworld)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
-		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	}

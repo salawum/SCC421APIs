@@ -39,7 +39,6 @@ func AddCharacter(w http.ResponseWriter, r *http.Request) {
 		c.BirthYear, c.Gender, c.Homeworld, c.Species)
 	if err != nil {
 		res_writer, msg, code := HandleError(w, string(err.Error()))
-		defer res.Close()
 		http.Error(res_writer, msg, code)
 		return
 	}
