@@ -43,7 +43,7 @@ namespace IO.Swagger.Controllers {
                 "Server=" + Environment.GetEnvironmentVariable("DB_HOST") + "," + Environment.GetEnvironmentVariable("DB_PORT") + ";" +
                 "Database=" + Environment.GetEnvironmentVariable("DB_DATABASE") + ";" +
                 "User ID=" + Environment.GetEnvironmentVariable("DB_USER") + ";" +
-                "Password=" + Environment.GetEnvironmentVariable("DB_PWD");
+                "Password=" + Environment.GetEnvironmentVariable("DB_PWD") + ";default command timeout=120";
             return connString;
         }
 
