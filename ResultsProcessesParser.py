@@ -1,9 +1,9 @@
 import csv
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
-
-path_to_results = "C:/apache-jmeter-5.4.1/results/SCC421/resultsProcesses.csv"
-path_to_output_file = "C:/apache-jmeter-5.4.1/results/SCC421/outputProcesses.txt"
-
+languages = ["C#", "Go", "Java", "Javascript", "Python"]
 
 def AggregateElapsedTime(cur_val, elapsed):
     elapsed += cur_val
@@ -45,39 +45,45 @@ def PrintNetworkStats():
     WriteAndPrint(f'Total network bytes received: {network_elapsed_total} bytes')
     WriteAndPrint(f'Max network bytes received: {max_network} bytes')
 
-with open(path_to_results) as csv_file:
-    csv_reader = csv.DictReader(csv_file)
-    line_count = 0
 
-    memory_elapsed_total = cpu_elapsed_total = network_elapsed_total = 0   
-    max_memory = max_cpu = max_network = 0
-    mem_lines = cpu_lines = net_lines = 0
+for language in languages:
+    print("\n"+language)
+    with open(os.getenv('path_to_results')+language+"/resultsProcesses_"+language+".csv") as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        line_count = 0
 
-    for row in csv_reader:
-        if line_count == 0:
+        memory_elapsed_total = cpu_elapsed_total = network_elapsed_total = 0   
+        max_memory = max_cpu = max_network = 0
+        mem_lines = cpu_lines = net_lines = 0
+
+        print("Reading Rows...")
+        for row in csv_reader:
+            if line_count == 0:
+                line_count += 1
+                continue
+            if row["elapsed"] != "0":
+                if "Memory" in row["label"]:
+                    mem_lines += 1
+                elif "CPU" in row["label"]:
+                    cpu_lines += 1
+                elif "Network" in row["label"]:
+                    net_lines += 1
+
+            # Total Elapsed Time
+            memory_elapsed_total = AggregateElapsedTime(GetElapsedTime(row, "Memory", "label"), memory_elapsed_total)
+            cpu_elapsed_total = AggregateElapsedTime(GetElapsedTime(row, "CPU", "label"), cpu_elapsed_total)
+            network_elapsed_total = AggregateElapsedTime(GetElapsedTime(row, "Network", "label"), network_elapsed_total)
+
+            # Max Elapsed Time
+            max_memory = GetMaxValue(GetElapsedTime(row, "Memory", "label"), max_memory)
+            max_cpu = GetMaxValue(GetElapsedTime(row, "CPU", "label"), max_cpu)
+            max_network = GetMaxValue(GetElapsedTime(row, "Network", "label"), max_network)
+            
             line_count += 1
-            continue
-        if "Memory" in row["label"]:
-            mem_lines += 1
-        elif "CPU" in row["label"]:
-            cpu_lines += 1
-        elif "Network" in row["label"]:
-            net_lines += 1
 
-        # Total Elapsed Time
-        memory_elapsed_total = AggregateElapsedTime(GetElapsedTime(row, "Memory", "label"), memory_elapsed_total)
-        cpu_elapsed_total = AggregateElapsedTime(GetElapsedTime(row, "CPU", "label"), cpu_elapsed_total)
-        network_elapsed_total = AggregateElapsedTime(GetElapsedTime(row, "Network", "label"), network_elapsed_total)
-
-        # Max Elapsed Time
-        max_memory = GetMaxValue(GetElapsedTime(row, "Memory", "label"), max_memory)
-        max_cpu = GetMaxValue(GetElapsedTime(row, "CPU", "label"), max_cpu)
-        max_network = GetMaxValue(GetElapsedTime(row, "Network", "label"), max_network)
-        
-        line_count += 1
-
-f = open(path_to_output_file, "w")   
-PrintMemoryStats()
-PrintCPUStats()
-PrintNetworkStats()
-f.close()
+    f = open(os.getenv("path_to_results")+language+"/outputProcesses_"+language+".txt", "w")
+    WriteAndPrint(language)  
+    PrintMemoryStats()
+    PrintCPUStats()
+    PrintNetworkStats()
+    f.close()
