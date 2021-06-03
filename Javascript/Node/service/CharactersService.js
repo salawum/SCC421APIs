@@ -32,12 +32,7 @@ exports.addCharacter = function(body){
   });
 }
 
-/**
- * Delete a character from the database
- *
- * name String 
- * no response value expected for this operation
- **/
+
 exports.deleteCharacter = function(name) {
   return new Promise(async function(resolve, reject){
     let conn;
@@ -47,7 +42,7 @@ exports.deleteCharacter = function(name) {
         "CALL starwars.deleteCharacter(?);",
         [name]
       );
-      console.log(res); // { affectedRows: 1, insertId: 1, warningStatus: 0 }
+      console.log(res);
       resolve(res);
     }catch (err) {
       console.log(err)

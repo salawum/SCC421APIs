@@ -33,12 +33,6 @@ exports.addSpecies = function(body) {
 }
 
 
-/**
- * Delete a species from the database
- *
- * name String 
- * no response value expected for this operation
- **/
 exports.deleteSpecies = function(name) {
   return new Promise(async function(resolve, reject) {
     let conn;
@@ -48,7 +42,7 @@ exports.deleteSpecies = function(name) {
         "CALL starwars.deleteSpecies(?);",
         [name]
       );
-      console.log(res); // { affectedRows: 1, insertId: 1, warningStatus: 0 }
+      console.log(res);
       resolve(res);
     }catch (err) {
       console.log(err)
