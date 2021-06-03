@@ -8,12 +8,7 @@ const pool = mariadb.createPool({
   connectionLimit: 5
 });
 
-/**
- * Add a species to the database
- *
- * body Species Species object to be added to the database
- * no response value expected for this operation
- **/
+
 exports.addSpecies = function(body) {
   return new Promise(async function(resolve, reject) {
     let conn;
@@ -24,7 +19,7 @@ exports.addSpecies = function(body) {
         [ body.name, body.classification, body.designation, body.average_height, body.skin_colors,
           body.hair_colours, body.eye_colors, body.average_lifespan, body.language, body.homeworld ]
       );
-      console.log(res); // { affectedRows: 1, insertId: 1, warningStatus: 0 }
+      console.log(res);
       resolve(res);
     }catch (err) {
       console.log(err)

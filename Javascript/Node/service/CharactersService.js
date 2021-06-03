@@ -8,12 +8,7 @@ const pool = mariadb.createPool({
   connectionLimit: 5
 });
 
-/**
- * Add a character to the database
- *
- * body Character Character object to be added to the database
- * no response value expected for this operation
- **/
+
 exports.addCharacter = function(body){
   return new Promise(async function(resolve, reject){
     let conn;
@@ -24,7 +19,7 @@ exports.addCharacter = function(body){
         [ body.name, body.height, body.mass, body.hair_color, body.skin_color, body.eye_color,
           body.birth_year, body.gender, body.homeworld, body.species ]
       );
-      console.log(res); // { affectedRows: 1, insertId: 1, warningStatus: 0 }
+      console.log(res);
       resolve(res);
     }catch (err) {
       console.log(err)

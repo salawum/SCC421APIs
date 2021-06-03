@@ -8,12 +8,7 @@ const pool = mariadb.createPool({
   connectionLimit: 5
 });
 
-/**
- * Add a planet to the database
- *
- * body Planet Planet object to be added to the database
- * no response value expected for this operation
- **/
+
 exports.addPlanet = function(body) {
   return new Promise(async function(resolve, reject) {
     let conn;
@@ -24,7 +19,7 @@ exports.addPlanet = function(body) {
         [ body.name, body.rotation_period, body.rotation_period, body.diameter, body.climate,
           body.gravity, body.terrain, body.surface_water, body.population ]
       );
-      console.log(res); // { affectedRows: 1, insertId: 1, warningStatus: 0 }
+      console.log(res);
       resolve(res);
     }catch (err) {
       console.log(err)
